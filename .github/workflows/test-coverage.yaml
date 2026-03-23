@@ -33,7 +33,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: mfrmr
-          extra-packages: any::covr
+          extra-packages: any::covr, any::xml2
           needs: coverage
 
       - name: Compute test coverage
