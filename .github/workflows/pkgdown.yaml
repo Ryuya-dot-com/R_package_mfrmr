@@ -3,6 +3,9 @@ name: pkgdown
 on:
   push:
     branches: [main, master]
+    paths:
+      - "mfrmr/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 permissions:
@@ -24,16 +27,19 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          working-directory: mfrmr
           extra-packages: any::pkgdown
           needs: website
 
       - name: Build pkgdown site
-        run: Rscript -e 'pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)'
+        working-directory: mfrmr
+        shell: Rscript {0}
+        run: pkgdown::build_site_github_pages(new_process = FALSE, install = TRUE)
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: mfrmr/docs
 
   deploy-site:
     environment:

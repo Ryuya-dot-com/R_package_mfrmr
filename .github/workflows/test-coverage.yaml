@@ -3,8 +3,14 @@ name: test-coverage
 on:
   push:
     branches: [main, master]
+    paths:
+      - "mfrmr/**"
+      - ".github/workflows/**"
   pull_request:
     branches: [main, master]
+    paths:
+      - "mfrmr/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 permissions:
@@ -26,22 +32,26 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          working-directory: mfrmr
           extra-packages: any::covr
           needs: coverage
 
       - name: Compute test coverage
+        working-directory: mfrmr
+        shell: Rscript {0}
         run: |
-          Rscript -e 'cov <- covr::package_coverage(type = "tests"); covr::to_cobertura(cov, filename = "coverage.xml")'
+          cov <- covr::package_coverage(path = ".", type = "tests")
+          covr::to_cobertura(cov, filename = "coverage.xml")
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-cobertura
-          path: coverage.xml
+          path: mfrmr/coverage.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          files: coverage.xml
+          files: mfrmr/coverage.xml
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
